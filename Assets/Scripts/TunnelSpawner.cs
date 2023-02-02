@@ -7,13 +7,13 @@ using UnityEngine;
 public class TunnelSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject firstTunnelSectionPrefab;
-    [SerializeField] private GameObject tunnelSectionPrefab; // Tunnel section prefab
-    [SerializeField] private float spawnDistance = 35.9f; // Distance at which a new tunnel section is spawned
-    [SerializeField] private Transform rocketTransform; // Rocket transform reference
+    [SerializeField] private GameObject[] tunnelSectionPrefabs;
+    [SerializeField] private float spawnDistance = 35.9f; 
+    [SerializeField] private Transform rocketTransform; 
 
     private const float spawnDistanceGap = 35.9f;
-    private Queue<GameObject> tunnelSections; // Object pool for tunnel sections
-    private Vector3 spawnPosition; // Position to spawn new tunnel sections
+    private Queue<GameObject> tunnelSections;
+    private Vector3 spawnPosition;
 
     private void Start()
     {
@@ -27,35 +27,29 @@ public class TunnelSpawner : MonoBehaviour
     {
         if (Vector3.Distance(rocketTransform.position, spawnPosition) < spawnDistance + spawnDistanceGap)
         {
-            print("SPAWN");
+            print("Spawn");
             SpawnTunnelSection();
         }
     }
 
-    // Function to spawn new tunnel sections
     private void SpawnTunnelSection()
     {
-        // Use object pool technique to spawn new tunnel sections
         GameObject tunnelSection;
-        if (tunnelSections.Count > 2)
+        if (tunnelSections.Count > 3)
         {
             tunnelSection = tunnelSections.Dequeue();
             if(firstTunnelSectionPrefab.activeInHierarchy) firstTunnelSectionPrefab.SetActive(false);
         }
         else
         {
-            tunnelSection = Instantiate(tunnelSectionPrefab);
+            tunnelSection = Instantiate(tunnelSectionPrefabs[Random.Range(0,tunnelSectionPrefabs.Length)]);
         }
 
-        // Set the position of the new tunnel section
         tunnelSection.transform.position = spawnPosition;
         tunnelSection.SetActive(true);
-
-        // Update the spawn position for the next tunnel section
-        spawnPosition += Vector3.up * 35.9f;
-
-        // Add the new tunnel section to the end of the queue
         tunnelSections.Enqueue(tunnelSection);
+        spawnPosition += Vector3.up * spawnDistance;
+        
     }
 }
 

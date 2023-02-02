@@ -5,20 +5,21 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class RocketConfigController : MonoBehaviour {
-    
-    [SerializeField] float rcsThrust = 100f;
-    [SerializeField] float shipThrust = 100f;
+public class RocketConfigController : MonoBehaviour
+{
+    [SerializeField] 
+    private ParticleSystem[] _particleSystems;
+    [SerializeField] 
+    private float shipThrust = 100f;
 
     Rigidbody rigidBody;
 
 	// Use this for initialization
-	void Start () {
-        
+	void Start ()
+    {
         rigidBody = GetComponent<Rigidbody>();		
 	}
-	
-	// FixedUpdate is called every 0.02 sec
+    
 	void FixedUpdate () {
         Thrust();
         Rotate();
@@ -31,6 +32,17 @@ public class RocketConfigController : MonoBehaviour {
         if (Input.GetMouseButton(0))
         {
             rigidBody.AddRelativeForce(Vector3.up * thrustThisFrame);
+            foreach (var particleSystem in _particleSystems)
+            {
+                particleSystem.Play();
+            }
+        }
+        else
+        {
+            foreach (var particleSystem in _particleSystems)
+            {
+                particleSystem.Stop();
+            }
         }
     }
 
