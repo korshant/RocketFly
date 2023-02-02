@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -29,32 +30,26 @@ public class RocketConfigController : MonoBehaviour {
 
         if (Input.GetMouseButton(0))
         {
-            // We scale up our force by the thrust for the frame
-            print("Thrusting");
             rigidBody.AddRelativeForce(Vector3.up * thrustThisFrame);
         }
     }
 
    private void Rotate()
 {
-    rigidBody.freezeRotation = true; // take manual control of rotation
+    rigidBody.freezeRotation = true;
 
     if (Input.GetMouseButton(0))
     {
-        // Get the mouse click position in world space
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = transform.position.z - Camera.main.transform.position.z;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-        
-        // Get the direction from the rocket to the mouse click position
         Vector3 direction = (worldPos - transform.position).normalized;
         direction.y = 1f;
-        
-        // Rotate the rocket to face the direction
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+        transform.DORotateQuaternion(targetRotation, 0.5f);
     }
 
-    rigidBody.freezeRotation = false; // resume physics control
+    rigidBody.freezeRotation = false;
 }
 
 
