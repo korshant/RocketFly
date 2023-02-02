@@ -49,7 +49,17 @@ public class TunnelSpawner : MonoBehaviour
         tunnelSection.SetActive(true);
         tunnelSections.Enqueue(tunnelSection);
         spawnPosition += Vector3.up * spawnDistance;
-        
+    }
+
+    public void ResetProgress()
+    {
+        firstTunnelSectionPrefab.SetActive(true);
+        foreach (var section in tunnelSections)
+        {
+            Destroy(section);
+        }
+        tunnelSections.Clear();
+        spawnPosition = new Vector3(0f,spawnDistance,0f);
     }
 }
 
