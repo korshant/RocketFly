@@ -20,6 +20,7 @@ public class RocketController : MonoBehaviour
     private Sequence seq;
     private Rigidbody rigidBody;
     private bool _isEnabled = true;
+    private bool _isLaunched = false;
     
     public Sequence FallingSequence
     {
@@ -27,6 +28,14 @@ public class RocketController : MonoBehaviour
         private set => seq = value;
     }
 
+    public bool IsLaunched
+    {
+        get => _isLaunched;
+        set
+        {
+            _isLaunched = value;
+        }
+    }
     public bool IsEnabled
     {
         get => _isEnabled;
@@ -51,7 +60,7 @@ public class RocketController : MonoBehaviour
         if (_isEnabled)
         {
             Thrust();
-            Rotate();
+            if(_isLaunched) Rotate();
         }
     }
 

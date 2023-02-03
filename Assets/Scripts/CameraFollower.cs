@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraFollower : MonoBehaviour
@@ -5,11 +6,10 @@ public class CameraFollower : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private float smoothSpeed = 0.125f;
     [SerializeField] private Vector3 offset;
-    [Range(-13f,0f)]
-    [SerializeField] private float _startingYPos;
+
+    [SerializeField] private LaunchTracker _launchTracker;
 
     private bool _isEnabled = false;
-    private bool _isLaunched = false;
 
     public bool IsEnabled
     {
@@ -17,13 +17,22 @@ public class CameraFollower : MonoBehaviour
         set => _isEnabled = value;
     }
 
+    private void OnEnable()
+    {
+        _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
+    }
+
+    private void OnDisable()
+    {
+        _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
+    }
+
+    private void LaunchTrackerOnOnRocketLaunch()
+    {
+        _isEnabled = true;
+    }
     private void LateUpdate()
     {
-        if (!_isLaunched && target.position.y > _startingYPos)
-        {
-            _isLaunched = true;
-            _isEnabled = true;
-        }
         if (_isEnabled)
         {
             Vector3 desiredPosition = target.position + offset;

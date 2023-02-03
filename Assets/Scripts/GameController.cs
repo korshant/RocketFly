@@ -9,18 +9,26 @@ public class GameController : MonoBehaviour
     [SerializeField] private RocketController _rocket;
     [SerializeField] private CameraFollower _follower;
     [SerializeField] private BoxCollider _startGameTrigger;
+    [SerializeField] private LaunchTracker _launchTracker;
 
     private bool _isGameStarted;
     public bool IsGameStarted => _isGameStarted;
 
     private void OnEnable()
     {
+        _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
         _rocket.OnRocketCollide += OnRocketCollide;
         _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
     }
 
+    private void LaunchTrackerOnOnRocketLaunch()
+    {
+        _rocket.IsLaunched = true;
+    }
+
     private void OnDisable()
     {
+        _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
         _rocket.OnRocketCollide -= OnRocketCollide;
         _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
     }
@@ -53,7 +61,6 @@ public class GameController : MonoBehaviour
 
     public void StartGame()
     {
-        print("Load");
         SceneManager.LoadScene(0);
     }
 }

@@ -724,6 +724,7 @@ MonoBehaviour:
   _rocket: {fileID: 1001819755}
   _follower: {fileID: 963194229}
   _startGameTrigger: {fileID: 2031808347}
+  _launchTracker: {fileID: 1001819756}
 --- !u!1 &767593254
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,7 +857,7 @@ MonoBehaviour:
   target: {fileID: 1001819751}
   smoothSpeed: 0.5
   offset: {x: 0, y: 4, z: 0}
-  _startingYPos: -5
+  _launchTracker: {fileID: 1001819756}
 --- !u!1 &1001819750
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,6 +870,7 @@ GameObject:
   - component: {fileID: 1001819754}
   - component: {fileID: 1001819752}
   - component: {fileID: 1001819755}
+  - component: {fileID: 1001819756}
   m_Layer: 0
   m_Name: Rocket
   m_TagString: Untagged
@@ -947,6 +949,19 @@ MonoBehaviour:
   - {fileID: 1995917346}
   - {fileID: 1995917345}
   - {fileID: 1995917344}
+--- !u!114 &1001819756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001819750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 803bd99531987a046b9fe7578299a69e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingYPos: -5.52
 --- !u!1 &1008998847
 GameObject:
   m_ObjectHideFlags: 0
