@@ -13,6 +13,8 @@ public class RocketController : MonoBehaviour
     [SerializeField] 
     private AudioSource _audioSource;
     [SerializeField] 
+    private AudioSource _explosionSource;
+    [SerializeField] 
     private float shipThrust = 100f;
     [SerializeField] 
     private ParticleSystem[] _explosionParticleSystems;
@@ -119,6 +121,8 @@ public class RocketController : MonoBehaviour
    
    public void Explode()
    {
+       _explosionSource.Play();
+           
        foreach (var particleSystem in _explosionParticleSystems)
        {
            particleSystem.Play();
