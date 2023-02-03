@@ -1,83 +1,101 @@
+using Assets.Scripts.Control;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameController : MonoBehaviour
+namespace Assets.Scripts
 {
-    [SerializeField]
-    private TunnelSpawner _tunnelSpawner;
-
-    [SerializeField]
-    private Transform _rocketBaseTransform;
-
-    [SerializeField]
-    private RocketController _rocket;
-
-    [SerializeField]
-    private CameraFollower _follower;
-
-    [SerializeField]
-    private BoxCollider _startGameTrigger;
-
-    [SerializeField]
-    private LaunchTracker _launchTracker;
-
-    private bool _isGameStarted;
-    public bool IsGameStarted => _isGameStarted;
-
-    private void OnEnable()
+    public class GameController : MonoBehaviour
     {
-        _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
-        _rocket.OnRocketCollide += OnRocketCollide;
-        _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
-    }
+        private bool _isGameStarted;
 
-    private void OnDisable()
-    {
-        _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
-        _rocket.OnRocketCollide -= OnRocketCollide;
-        _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
-    }
+        [SerializeField] 
+        private GameConfig _gameConfig;
+    
+        [SerializeField]
+        private TunnelSpawner _tunnelSpawner;
 
-    private void LaunchTrackerOnOnRocketLaunch()
-    {
-        _rocket.IsLaunched = true;
-    }
+        [SerializeField]
+        private RocketController _rocket;
 
-    private void OnRocketHitTrigger()
-    {
-        _isGameStarted = true;
-    }
+        [SerializeField]
+        private CameraFollower _cameraFollower;
 
-    private void OnRocketCollide(Collision collision)
-    {
-        if (_isGameStarted)
+        [SerializeField]
+        private BoxCollider _startGameTrigger;
+
+        [SerializeField]
+        private LaunchTracker _launchTracker;
+    
+        public bool IsGameStarted => _isGameStarted;
+
+        public void StartGame()
         {
-            _isGameStarted = false;
-
-            _rocket.Explode();
-            _rocket.IsEnabled = false;
-            _isGameStarted = false;
-            _follower.IsEnabled = false;
-            DOTween.Sequence()
-                .AppendInterval(0.5f)
-                .AppendCallback(_rocket.EnableFallingMode)
-                .AppendInterval(2f)
-                .AppendCallback(StartGame);
+            // reset states
+            // spawn player
+            // spawn blocks
+            SceneManager.LoadScene(0);
         }
-        else if (_rocket.FallingSequence != null)
+
+        private void Awake()
         {
-            _rocket.Explode();
-            if (_rocket.FallingSequence.active)
+            _rocket.ShipSpeed = _gameConfig.rocketSpeed;
+        }
+
+        private void ResetComponents()
+        {
+        
+        }
+    
+        private void OnEnable()
+        {
+            _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
+            _rocket.OnRocketCollide += OnRocketCollide;
+            _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
+        }
+
+        private void OnDisable()
+        {
+            _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
+            _rocket.OnRocketCollide -= OnRocketCollide;
+            _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
+        }
+
+        private void LaunchTrackerOnOnRocketLaunch()
+        {
+            _rocket.IsLaunched = true;
+        }
+
+        private void OnRocketHitTrigger()
+        {
+            _isGameStarted = true;
+        }
+
+        private void OnRocketCollide(Collision collision)
+        {
+            if (_isGameStarted)
             {
-                _rocket.DisableFallingMode();
+                _isGameStarted = false;
+
+                _rocket.Explode();
+                _rocket.IsEnabled = false;
+                _isGameStarted = false;
+                _cameraFollower.IsEnabled = false;
+                DOTween.Sequence()
+                    .AppendInterval(0.5f)
+                    .AppendCallback(_rocket.EnableFallingMode)
+                    .AppendInterval(2f)
+                    .AppendCallback(StartGame);
+            }
+            else if (_rocket.FallingSequence != null)
+            {
+                _rocket.Explode();
+                if (_rocket.FallingSequence.active)
+                {
+                    _rocket.DisableFallingMode();
+                }
             }
         }
-    }
-
-    public void StartGame()
-    {
-        SceneManager.LoadScene(0);
     }
 }
 
