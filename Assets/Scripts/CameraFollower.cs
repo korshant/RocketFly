@@ -5,8 +5,11 @@ public class CameraFollower : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private float smoothSpeed = 0.125f;
     [SerializeField] private Vector3 offset;
+    [Range(-13f,0f)]
+    [SerializeField] private float _startingYPos;
 
-    private bool _isEnabled = true;
+    private bool _isEnabled = false;
+    private bool _isLaunched = false;
 
     public bool IsEnabled
     {
@@ -16,6 +19,11 @@ public class CameraFollower : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (!_isLaunched && target.position.y > _startingYPos)
+        {
+            _isLaunched = true;
+            _isEnabled = true;
+        }
         if (_isEnabled)
         {
             Vector3 desiredPosition = target.position + offset;

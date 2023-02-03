@@ -1,40 +1,52 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] private TunnelSpawner _tunnelSpawner;
     [SerializeField] private Transform _rocketBaseTransform;
     [SerializeField] private RocketController _rocket;
+    [SerializeField] private CameraFollower _follower;
+    [SerializeField] private BoxCollider _startGameTrigger;
+
+    private bool _isGameStarted;
+    public bool IsGameStarted => _isGameStarted;
 
     private void OnEnable()
     {
-        _rocket.OnRocketHit += RocketOnOnRocketHit;
+        _rocket.OnRocketCollide += OnRocketCollide;
+        _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
     }
 
     private void OnDisable()
     {
-        _rocket.OnRocketHit -= RocketOnOnRocketHit;
+        _rocket.OnRocketCollide -= OnRocketCollide;
+        _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
     }
 
-    private void RocketOnOnRocketHit()
+    private void OnRocketHitTrigger()
     {
-        DOTween.Sequence()
-            .AppendCallback(() =>
-            {
-                print("Show nice falling");
-            })
-            .AppendInterval(2f)
-            .AppendCallback(StartGame);
+        _isGameStarted = true;
+    }
+    private void OnRocketCollide()
+    {
+        if (_isGameStarted)
+        {
+            DOTween.Sequence()
+                .AppendCallback(() =>
+                {
+                    _rocket.IsEnabled = false;
+                    _isGameStarted = false;
+                    _follower.IsEnabled = false;
+                })
+                .AppendInterval(3f)
+                .AppendCallback(StartGame);
+        }
     }
 
     public void StartGame()
     {
-        _tunnelSpawner.ResetProgress();
-        _rocket.gameObject.transform.position = _rocketBaseTransform.position;
-        _rocket.gameObject.transform.rotation = _rocketBaseTransform.rotation;
+        SceneManager.LoadScene(0);
     }
 }

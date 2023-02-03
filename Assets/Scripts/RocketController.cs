@@ -1,14 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class RocketController : MonoBehaviour
 {
     public delegate void RocketEvent();
-    public event RocketEvent OnRocketHit;
+    public event RocketEvent OnRocketHitTrigger;
+    public event RocketEvent OnRocketCollide;
     
     [SerializeField] 
     private ParticleSystem[] _particleSystems;
@@ -17,17 +14,27 @@ public class RocketController : MonoBehaviour
     [SerializeField] 
     private float shipThrust = 100f;
 
-    Rigidbody rigidBody;
+    private Rigidbody rigidBody;
+    private bool _isEnabled = true;
 
-	// Use this for initialization
-	void Start ()
+    public bool IsEnabled
     {
-        rigidBody = GetComponent<Rigidbody>();		
-	}
+        get => _isEnabled;
+        set => _isEnabled = value;
+    }
+
+    private void Start ()
+    {
+        rigidBody = GetComponent<Rigidbody>();
+        _isEnabled = true;
+    }
 
     private void FixedUpdate () {
-        Thrust();
-        Rotate();
+        if (_isEnabled)
+        {
+            Thrust();
+            Rotate();
+        }
     }
 
     private void Thrust()
@@ -64,17 +71,20 @@ public class RocketController : MonoBehaviour
             mousePos.z = transform.position.z - Camera.main.transform.position.z;
             Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
             Vector3 direction = (worldPos - transform.position).normalized;
-            direction.y = 1f;
+            direction.y = 0.5f;
             Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
             transform.DORotateQuaternion(targetRotation, 0.5f);
         }
 
         rigidBody.freezeRotation = false;
     }
-
-   private void OnCollisionEnter(Collision collision)
+   private void OnCollisionEnter()
    {
-       OnRocketHit?.Invoke();
-       print("you hit the wall");
+       OnRocketCollide?.Invoke();
+   }
+
+   private void OnTriggerEnter()
+   {
+       OnRocketHitTrigger?.Invoke();
    }
 }
