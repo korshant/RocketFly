@@ -8,8 +8,9 @@ public class LaunchTracker : MonoBehaviour
     public delegate void RocketLaunched();
     public event RocketLaunched OnRocketLaunch;
 
-    [Range(-13f,0f)]
-    [SerializeField] private float _startingYPos;
+    [Range(-13f, 0f)]
+    [SerializeField]
+    private float _startingYPos;
 
     private bool _isLaunched = false;
 

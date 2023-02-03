@@ -26,11 +26,7 @@ public class CameraFollower : MonoBehaviour
     {
         _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
     }
-
-    private void LaunchTrackerOnOnRocketLaunch()
-    {
-        _isEnabled = true;
-    }
+    
     private void LateUpdate()
     {
         if (_isEnabled)
@@ -39,5 +35,10 @@ public class CameraFollower : MonoBehaviour
             Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
             transform.position = new Vector3(transform.position.x, smoothedPosition.y, transform.position.z);
         }
+    }
+    
+    private void LaunchTrackerOnOnRocketLaunch()
+    {
+        _isEnabled = true;
     }
 }

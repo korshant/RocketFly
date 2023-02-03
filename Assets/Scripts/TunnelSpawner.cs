@@ -3,26 +3,33 @@ using UnityEngine;
 
 public class TunnelSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject firstTunnelSectionPrefab;
-    [SerializeField] private GameObject[] tunnelSectionPrefabs;
-    [SerializeField] private float spawnDistance = 35.9f; 
-    [SerializeField] private Transform rocketTransform; 
+    [SerializeField]
+    private GameObject firstTunnelSectionPrefab;
 
-    private const float spawnDistanceGap = 35.9f;
+    [SerializeField]
+    private GameObject[] tunnelSectionPrefabs;
+
+    [SerializeField]
+    private float spawnDistance = 35.9f;
+
+    [SerializeField]
+    private Transform rocketTransform;
+
+    private const float SpawnDistanceGap = 35.9f;
     private Queue<GameObject> tunnelSections;
     private Vector3 spawnPosition;
 
     private void Start()
     {
         tunnelSections = new Queue<GameObject>();
-        spawnPosition = new Vector3(0f,spawnDistance,0f);
-        
+        spawnPosition = new Vector3(0f, spawnDistance, 0f);
+
         SpawnTunnelSection();
     }
 
     private void Update()
     {
-        if (Vector3.Distance(rocketTransform.position, spawnPosition) < spawnDistance + spawnDistanceGap)
+        if (Vector3.Distance(rocketTransform.position, spawnPosition) < spawnDistance + SpawnDistanceGap)
         {
             SpawnTunnelSection();
         }
@@ -34,11 +41,14 @@ public class TunnelSpawner : MonoBehaviour
         if (tunnelSections.Count > 3)
         {
             tunnelSection = tunnelSections.Dequeue();
-            if(firstTunnelSectionPrefab.activeInHierarchy) firstTunnelSectionPrefab.SetActive(false);
+            if (firstTunnelSectionPrefab.activeInHierarchy)
+            {
+                firstTunnelSectionPrefab.SetActive(false);
+            }
         }
         else
         {
-            tunnelSection = Instantiate(tunnelSectionPrefabs[Random.Range(0,tunnelSectionPrefabs.Length)]);
+            tunnelSection = Instantiate(tunnelSectionPrefabs[Random.Range(0, tunnelSectionPrefabs.Length)]);
         }
 
         tunnelSection.transform.position = spawnPosition;
@@ -55,7 +65,8 @@ public class TunnelSpawner : MonoBehaviour
             Destroy(section);
         }
         tunnelSections.Clear();
-        spawnPosition = new Vector3(0f,spawnDistance,0f);
+        spawnPosition = new Vector3(0f, spawnDistance, 0f);
     }
 }
+
 

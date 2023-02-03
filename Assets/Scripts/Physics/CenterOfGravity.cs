@@ -6,7 +6,7 @@ public class CenterOfGravity : MonoBehaviour
     [SerializeField]
     private Transform centerOfGravity;
     
-    void Start()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         if (centerOfGravity)

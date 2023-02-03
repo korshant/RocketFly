@@ -4,12 +4,23 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private TunnelSpawner _tunnelSpawner;
-    [SerializeField] private Transform _rocketBaseTransform;
-    [SerializeField] private RocketController _rocket;
-    [SerializeField] private CameraFollower _follower;
-    [SerializeField] private BoxCollider _startGameTrigger;
-    [SerializeField] private LaunchTracker _launchTracker;
+    [SerializeField]
+    private TunnelSpawner _tunnelSpawner;
+
+    [SerializeField]
+    private Transform _rocketBaseTransform;
+
+    [SerializeField]
+    private RocketController _rocket;
+
+    [SerializeField]
+    private CameraFollower _follower;
+
+    [SerializeField]
+    private BoxCollider _startGameTrigger;
+
+    [SerializeField]
+    private LaunchTracker _launchTracker;
 
     private bool _isGameStarted;
     public bool IsGameStarted => _isGameStarted;
@@ -21,11 +32,6 @@ public class GameController : MonoBehaviour
         _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
     }
 
-    private void LaunchTrackerOnOnRocketLaunch()
-    {
-        _rocket.IsLaunched = true;
-    }
-
     private void OnDisable()
     {
         _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
@@ -33,16 +39,22 @@ public class GameController : MonoBehaviour
         _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
     }
 
+    private void LaunchTrackerOnOnRocketLaunch()
+    {
+        _rocket.IsLaunched = true;
+    }
+
     private void OnRocketHitTrigger()
     {
         _isGameStarted = true;
     }
+
     private void OnRocketCollide(Collision collision)
     {
         if (_isGameStarted)
         {
             _isGameStarted = false;
-            
+
             _rocket.Explode();
             _rocket.IsEnabled = false;
             _isGameStarted = false;
@@ -52,10 +64,14 @@ public class GameController : MonoBehaviour
                 .AppendCallback(_rocket.EnableFallingMode)
                 .AppendInterval(2f)
                 .AppendCallback(StartGame);
-        } else if (_rocket.FallingSequence != null)
+        }
+        else if (_rocket.FallingSequence != null)
         {
             _rocket.Explode();
-            if(_rocket.FallingSequence.active) _rocket.DisableFallingMode();
+            if (_rocket.FallingSequence.active)
+            {
+                _rocket.DisableFallingMode();
+            }
         }
     }
 
@@ -64,3 +80,4 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 }
+
