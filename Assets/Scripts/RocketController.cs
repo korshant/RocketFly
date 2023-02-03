@@ -129,6 +129,7 @@ public class RocketController : MonoBehaviour
 
    public void DisableFallingMode()
    {
-       if(seq.active) seq.Kill();
+       if (seq != null) if(seq.active) seq.Kill();
+       
    }
 }

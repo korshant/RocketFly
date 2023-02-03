@@ -33,17 +33,16 @@ public class GameController : MonoBehaviour
     {
         if (_isGameStarted)
         {
+            _isGameStarted = false;
+            
+            _rocket.Explode();
+            _rocket.IsEnabled = false;
+            _isGameStarted = false;
+            _follower.IsEnabled = false;
             DOTween.Sequence()
-                .AppendCallback(() =>
-                {
-                    _rocket.EnableFallingMode();
-                    _rocket.Explode();
-                    _rocket.IsEnabled = false;
-                    _isGameStarted = false;
-                    _isGameStarted = false;
-                    _follower.IsEnabled = false;
-                })
-                .AppendInterval(3f)
+                .AppendInterval(0.5f)
+                .AppendCallback(_rocket.EnableFallingMode)
+                .AppendInterval(2f)
                 .AppendCallback(StartGame);
         } else if (_rocket.FallingSequence != null)
         {
@@ -54,6 +53,7 @@ public class GameController : MonoBehaviour
 
     public void StartGame()
     {
+        print("Load");
         SceneManager.LoadScene(0);
     }
 }
