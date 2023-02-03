@@ -29,19 +29,26 @@ public class GameController : MonoBehaviour
     {
         _isGameStarted = true;
     }
-    private void OnRocketCollide()
+    private void OnRocketCollide(Collision collision)
     {
         if (_isGameStarted)
         {
             DOTween.Sequence()
                 .AppendCallback(() =>
                 {
+                    _rocket.EnableFallingMode();
+                    _rocket.Explode();
                     _rocket.IsEnabled = false;
+                    _isGameStarted = false;
                     _isGameStarted = false;
                     _follower.IsEnabled = false;
                 })
                 .AppendInterval(3f)
                 .AppendCallback(StartGame);
+        } else if (_rocket.FallingSequence != null)
+        {
+            _rocket.Explode();
+            if(_rocket.FallingSequence.active) _rocket.DisableFallingMode();
         }
     }
 

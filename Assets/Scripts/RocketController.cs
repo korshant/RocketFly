@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {
-    public delegate void RocketEvent();
-    public event RocketEvent OnRocketHitTrigger;
-    public event RocketEvent OnRocketCollide;
+    public delegate void RocketTriggerEvent();
+    public delegate void RocketCollideEvent(Collision collision);
+    public event RocketTriggerEvent OnRocketHitTrigger;
+    public event RocketCollideEvent OnRocketCollide;
     
     [SerializeField] 
     private ParticleSystem[] _particleSystems;
@@ -13,18 +14,35 @@ public class RocketController : MonoBehaviour
     private AudioSource _audioSource;
     [SerializeField] 
     private float shipThrust = 100f;
+    [SerializeField] 
+    private ParticleSystem[] _explosionParticleSystems;
 
+    private Sequence seq;
     private Rigidbody rigidBody;
     private bool _isEnabled = true;
+    
+    public Sequence FallingSequence
+    {
+        get => seq;
+        private set => seq = value;
+    }
 
     public bool IsEnabled
     {
         get => _isEnabled;
-        set => _isEnabled = value;
+        set
+        {
+            _isEnabled = value;
+            if(!_isEnabled) StopThrust();
+        }
     }
 
     private void Start ()
     {
+        foreach (var particleSystem in _explosionParticleSystems)
+        {
+            particleSystem.Stop();
+        }
         rigidBody = GetComponent<Rigidbody>();
         _isEnabled = true;
     }
@@ -52,12 +70,17 @@ public class RocketController : MonoBehaviour
         }
         else
         {
-            if(_audioSource.isPlaying) _audioSource.Stop();
+            StopThrust();
+        }
+    }
+
+    private void StopThrust()
+    {
+        if(_audioSource.isPlaying) _audioSource.Stop();
             
-            foreach (var particleSystem in _particleSystems)
-            {
-                particleSystem.Stop();
-            }
+        foreach (var particleSystem in _particleSystems)
+        {
+            particleSystem.Stop();
         }
     }
 
@@ -78,13 +101,34 @@ public class RocketController : MonoBehaviour
 
         rigidBody.freezeRotation = false;
     }
-   private void OnCollisionEnter()
+   
+   private void OnCollisionEnter(Collision collision)
    {
-       OnRocketCollide?.Invoke();
+       OnRocketCollide?.Invoke(collision);
    }
 
    private void OnTriggerEnter()
    {
        OnRocketHitTrigger?.Invoke();
+   }
+
+   public void Explode()
+   {
+       foreach (var particleSystem in _explosionParticleSystems)
+       {
+           particleSystem.Play();
+       }
+   }
+
+   public void EnableFallingMode()
+   {
+       Quaternion targetRotation1 = new Quaternion(0f, 0f, 1f,0f);
+       seq = DOTween.Sequence()
+           .Append(transform.DORotateQuaternion(targetRotation1, 2f));
+   }
+
+   public void DisableFallingMode()
+   {
+       if(seq.active) seq.Kill();
    }
 }

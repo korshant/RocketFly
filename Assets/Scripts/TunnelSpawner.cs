@@ -27,7 +27,6 @@ public class TunnelSpawner : MonoBehaviour
     {
         if (Vector3.Distance(rocketTransform.position, spawnPosition) < spawnDistance + spawnDistanceGap)
         {
-            print("Spawn");
             SpawnTunnelSection();
         }
     }
