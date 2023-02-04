@@ -719,10 +719,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 458b051bb8b5d734ea62df41fb5e48cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameConfig: {fileID: 11400000, guid: 36707f374435d75428a2bb7cce33c4af, type: 2}
   _tunnelSpawner: {fileID: 1460502313}
-  _rocketBaseTransform: {fileID: 0}
   _rocket: {fileID: 1001819755}
-  _follower: {fileID: 963194229}
+  _cameraFollower: {fileID: 963194229}
   _startGameTrigger: {fileID: 2031808347}
   _launchTracker: {fileID: 1001819756}
 --- !u!1 &963194225
@@ -912,7 +912,6 @@ MonoBehaviour:
   - {fileID: 1348002661}
   _audioSource: {fileID: 304844472}
   _explosionSource: {fileID: 1212426314}
-  shipThrust: 800
   _explosionParticleSystems:
   - {fileID: 1995917346}
   - {fileID: 1995917345}
