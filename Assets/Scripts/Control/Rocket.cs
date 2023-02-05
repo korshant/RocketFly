@@ -1,12 +1,11 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace Assets.Scripts.Control
+namespace RocketFly.Scripts
 {
     public class Rocket : MonoBehaviour
     {
-
-        private const float DEFAULT_THRUST_FORCE_VALUE = 800f;
+        private const float DefaultThrustForceValue = 800f;
         public delegate void RocketTriggerEvent();
         public delegate void RocketCollideEvent(Collision collision);
         public event RocketTriggerEvent OnRocketHitTrigger;
@@ -40,7 +39,7 @@ namespace Assets.Scripts.Control
         public float ShipSpeed
         {
             get => _shipSpeed;
-            set => _shipSpeed = DEFAULT_THRUST_FORCE_VALUE * value;
+            set => _shipSpeed = DefaultThrustForceValue * value;
         }
 
         public Sequence FallingSequence
@@ -108,7 +107,7 @@ namespace Assets.Scripts.Control
 
         private void Awake()
         {
-            _shipSpeed = _gameConfig.rocketSpeed * DEFAULT_THRUST_FORCE_VALUE;
+            _shipSpeed = _gameConfig.rocketSpeed * DefaultThrustForceValue;
         }
     
         private void Start ()

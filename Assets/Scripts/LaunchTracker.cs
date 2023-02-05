@@ -1,32 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class LaunchTracker : MonoBehaviour
+namespace RocketFly.Scripts
 {
-    public delegate void RocketLaunched();
-    public event RocketLaunched OnRocketLaunch;
-
-    [Range(-13f, 0f)]
-    [SerializeField]
-    private float _startingYPos;
-
-    private bool _isLaunched = false;
-
-    public bool IsLaunched
+    public class LaunchTracker : MonoBehaviour
     {
-        get => _isLaunched;
-        set => _isLaunched = value;
-    }
+        public delegate void RocketLaunched();
+        public event RocketLaunched OnRocketLaunch;
 
-    private void Update()
-    {
-        if (!_isLaunched && transform.position.y > _startingYPos)
+        [Range(-13f, 0f)]
+        [SerializeField]
+        private float _startingYPos;
+
+        private bool _isLaunched = false;
+
+        public bool IsLaunched
         {
-            print("Rocket Launched");
-            _isLaunched = true;
-            OnRocketLaunch?.Invoke();
+            get => _isLaunched;
+            set => _isLaunched = value;
+        }
+
+        private void Update()
+        {
+            if (!_isLaunched && transform.position.y > _startingYPos)
+            {
+                print("Rocket Launched");
+                _isLaunched = true;
+                OnRocketLaunch?.Invoke();
+            }
         }
     }
 }

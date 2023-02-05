@@ -1,9 +1,7 @@
-using Assets.Scripts.Control;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-namespace Assets.Scripts
+namespace RocketFly.Scripts
 {
     public class GameController : MonoBehaviour
     {
@@ -20,7 +18,7 @@ namespace Assets.Scripts
 
         [SerializeField]
         private CameraFollower _cameraFollower;
-        
+
         public bool IsGameStarted => _isGameStarted;
         
         private void Start()
@@ -54,9 +52,16 @@ namespace Assets.Scripts
             SpawnRocket();
             ResetCameraFollower();
             EnableEventsTracking();
+            SpawnTunnel();
+        }
+
+        private void SpawnTunnel()
+        {
+            _tunnelSpawner.Configure(_gameConfig);
             _tunnelSpawner.SpawnTunnelSection();
             _tunnelSpawner.SpawnTunnelSection();
         }
+        
         private void SpawnRocket()
         {
             print("SpawnRocket");
@@ -115,7 +120,6 @@ namespace Assets.Scripts
                     .AppendInterval(0.5f)
                     .AppendCallback(()=>
                     {
-                        DisableEventsTracking();
                         _rocket.EnableFallingMode();
                     })
                     .AppendInterval(2f)
@@ -126,6 +130,7 @@ namespace Assets.Scripts
                 if (_rocket.FallingSequence.active)
                 {
                     _rocket.DisableFallingMode();
+                    DisableEventsTracking();
                 }
             }
         }
