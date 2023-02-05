@@ -1,71 +1,60 @@
 using System.Collections.Generic;
+using Assets.Scripts;
 using UnityEngine;
 
 public class TunnelSpawner : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject firstTunnelSectionPrefab;
+    [SerializeField] 
+    private GameConfig _gameConfig;
+    
+    private GameObject _firstTunnelSectionPrefab;
+    private GameObject[] _tunnelSectionPrefabs;
+    private float _tunnelSectionHeight;
+    private float _spawnDistanceGap;
+    private Queue<GameObject> _tunnelSections;
+    private Vector3 _spawnPosition;
 
-    [SerializeField]
-    private GameObject[] tunnelSectionPrefabs;
-
-    [SerializeField]
-    private float spawnDistance = 35.9f;
-
-    [SerializeField]
-    private Transform rocketTransform;
-
-    private const float SpawnDistanceGap = 35.9f;
-    private Queue<GameObject> tunnelSections;
-    private Vector3 spawnPosition;
-
-    private void Start()
+    private void Awake()
     {
-        tunnelSections = new Queue<GameObject>();
-        spawnPosition = new Vector3(0f, spawnDistance, 0f);
-
-        SpawnTunnelSection();
+        _firstTunnelSectionPrefab = _gameConfig.firstTunnelSection;
+        _tunnelSectionPrefabs = _gameConfig.randomTunnelSections;
+        _tunnelSectionHeight = _gameConfig.tunnelSectionHeight;
+        _spawnDistanceGap = _gameConfig.spawnDistanceGap;
+        _tunnelSections = new Queue<GameObject>();
+        _spawnPosition = new Vector3(0f, _tunnelSectionHeight, 0f);
     }
 
-    private void Update()
-    {
-        if (Vector3.Distance(rocketTransform.position, spawnPosition) < spawnDistance + SpawnDistanceGap)
-        {
-            SpawnTunnelSection();
-        }
-    }
-
-    private void SpawnTunnelSection()
+    public void SpawnTunnelSection()
     {
         GameObject tunnelSection;
-        if (tunnelSections.Count > 3)
+        if (_tunnelSections.Count > 3)
         {
-            tunnelSection = tunnelSections.Dequeue();
-            if (firstTunnelSectionPrefab.activeInHierarchy)
+            tunnelSection = _tunnelSections.Dequeue();
+            if (_firstTunnelSectionPrefab.activeInHierarchy)
             {
-                firstTunnelSectionPrefab.SetActive(false);
+                _firstTunnelSectionPrefab.SetActive(false);
             }
         }
         else
         {
-            tunnelSection = Instantiate(tunnelSectionPrefabs[Random.Range(0, tunnelSectionPrefabs.Length)]);
+            tunnelSection = Instantiate(_tunnelSectionPrefabs[Random.Range(0, _tunnelSectionPrefabs.Length)]);
         }
 
-        tunnelSection.transform.position = spawnPosition;
+        tunnelSection.transform.position = _spawnPosition;
         tunnelSection.SetActive(true);
-        tunnelSections.Enqueue(tunnelSection);
-        spawnPosition += Vector3.up * spawnDistance;
+        _tunnelSections.Enqueue(tunnelSection);
+        _spawnPosition += Vector3.up * _tunnelSectionHeight;
     }
 
     public void ResetProgress()
     {
-        firstTunnelSectionPrefab.SetActive(true);
-        foreach (var section in tunnelSections)
+        _firstTunnelSectionPrefab.SetActive(true);
+        foreach (var section in _tunnelSections)
         {
             Destroy(section);
         }
-        tunnelSections.Clear();
-        spawnPosition = new Vector3(0f, spawnDistance, 0f);
+        _tunnelSections.Clear();
+        _spawnPosition = new Vector3(0f, _tunnelSectionHeight, 0f);
     }
 }
 

@@ -17,6 +17,9 @@ namespace Assets.Scripts
 
         [SerializeField]
         private RocketController _rocket;
+        
+        [SerializeField]
+        private RocketHeightTracker _heightTracker;
 
         [SerializeField]
         private CameraFollower _cameraFollower;
@@ -42,20 +45,32 @@ namespace Assets.Scripts
             _rocket.ShipSpeed = _gameConfig.rocketSpeed;
         }
 
+        private void Start()
+        {
+            _tunnelSpawner.SpawnTunnelSection();
+        }
+
         private void ResetComponents()
         {
         
         }
-    
+
         private void OnEnable()
         {
+            _heightTracker.OnHeightReached += OnHeightReached;
             _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
             _rocket.OnRocketCollide += OnRocketCollide;
             _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
         }
 
+        private void OnHeightReached(float height)
+        {
+            _tunnelSpawner.SpawnTunnelSection();
+        }
+
         private void OnDisable()
         {
+            _heightTracker.OnHeightReached -= OnHeightReached;
             _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
             _rocket.OnRocketCollide -= OnRocketCollide;
             _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;

@@ -5,11 +5,15 @@ namespace Assets.Scripts.Control
 {
     public class RocketController : MonoBehaviour
     {
+
+        private const float DEFAULT_THRUST_FORCE_VALUE = 800f;
         public delegate void RocketTriggerEvent();
         public delegate void RocketCollideEvent(Collision collision);
         public event RocketTriggerEvent OnRocketHitTrigger;
         public event RocketCollideEvent OnRocketCollide;
-    
+
+        [SerializeField] 
+        private GameConfig _gameConfig;
         [SerializeField] 
         private ParticleSystem[] _particleSystems;
         [SerializeField] 
@@ -28,7 +32,7 @@ namespace Assets.Scripts.Control
         public float ShipSpeed
         {
             get => _shipSpeed;
-            set => _shipSpeed = value;
+            set => _shipSpeed = DEFAULT_THRUST_FORCE_VALUE * value;
         }
 
         public Sequence FallingSequence
@@ -52,6 +56,11 @@ namespace Assets.Scripts.Control
                 _isEnabled = value;
                 if(!_isEnabled) StopThrust();
             }
+        }
+
+        private void Awake()
+        {
+            _shipSpeed = _gameConfig.rocketSpeed * DEFAULT_THRUST_FORCE_VALUE;
         }
     
         private void Start ()
