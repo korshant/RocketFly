@@ -6,6 +6,7 @@ namespace RocketFly.Scripts
     public class TunnelSpawner : MonoBehaviour
     {
         private GameObject _firstTunnelSectionPrefab;
+        private GameObject _firstTunnelSectionInstanceRef;
         private GameObject[] _tunnelSectionPrefabs;
         private float _tunnelSectionHeight;
         private Queue<GameObject> _tunnelSections;
@@ -29,6 +30,7 @@ namespace RocketFly.Scripts
             if (_tunnelSections.Count == 0)
             {
                 tunnelSection = Instantiate(_firstTunnelSectionPrefab);
+                _firstTunnelSectionInstanceRef = tunnelSection;
             }
             else if (_tunnelSections.Count > 3)
             {
@@ -36,14 +38,14 @@ namespace RocketFly.Scripts
             }
             else
             {
-                tunnelSection = Instantiate(_tunnelSectionPrefabs[Random.Range(1, _tunnelSectionPrefabs.Length)]);
+                tunnelSection = Instantiate(_tunnelSectionPrefabs[Random.Range(0, _tunnelSectionPrefabs.Length)]);
             }
 
             tunnelSection.transform.SetParent(_tunnelSectionsParent);
             tunnelSection.transform.position = _spawnPosition;
         
             tunnelSection.SetActive(true);
-            _tunnelSections.Enqueue(tunnelSection);
+            if(tunnelSection != _firstTunnelSectionInstanceRef) _tunnelSections.Enqueue(tunnelSection);
             _spawnPosition += Vector3.up * _tunnelSectionHeight;
         }
 
