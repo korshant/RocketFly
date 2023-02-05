@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Control
 {
-    public class RocketController : MonoBehaviour
+    public class Rocket : MonoBehaviour
     {
 
         private const float DEFAULT_THRUST_FORCE_VALUE = 800f;
@@ -22,12 +22,20 @@ namespace Assets.Scripts.Control
         private AudioSource _explosionSource;
         [SerializeField] 
         private ParticleSystem[] _explosionParticleSystems;
+        [SerializeField] 
+        private RocketHeightTracker _heightTracker;
+        [SerializeField]
+        private LaunchTracker _launchTracker; 
 
         private float _shipSpeed;
         private Sequence _fallingSequence;
         private Rigidbody _rigidBody;
         private bool _isEnabled = true;
         private bool _isLaunched = false;
+
+        public RocketHeightTracker HeightTracker => _heightTracker;
+
+        public LaunchTracker LaunchTracker => _launchTracker;
 
         public float ShipSpeed
         {
@@ -58,6 +66,46 @@ namespace Assets.Scripts.Control
             }
         }
 
+        public GameObject SpawnRocket()
+        {
+            return Instantiate(_gameConfig._rocketPrefab, _gameConfig.rocketStartPos,
+                _gameConfig._rocketPrefab.transform.rotation);
+        }
+
+        public void Explode()
+        {
+            _explosionSource.Play();
+           
+            foreach (var particleSystem in _explosionParticleSystems)
+            {
+                particleSystem.Play();
+            }
+        }
+
+        public void EnableFallingMode()
+        {
+            Quaternion targetRotation1 = new Quaternion(0f, 0f, 1f,0f);
+            _fallingSequence = DOTween.Sequence()
+                .Append(transform.DORotateQuaternion(targetRotation1, 2f));
+        }
+
+        public void DisableFallingMode()
+        {
+            if (_fallingSequence != null) if(_fallingSequence.active) _fallingSequence.Kill();
+        }
+
+        public void Reset()
+        {
+            print("Rocket reset");
+            _isEnabled = true;
+            _isLaunched = false;
+            _heightTracker.Reset();
+            _launchTracker.IsLaunched = false;
+            if(_fallingSequence.active) _fallingSequence.Kill();
+            transform.position = _gameConfig.rocketStartPos;
+            transform.rotation = Quaternion.identity;
+        }
+
         private void Awake()
         {
             _shipSpeed = _gameConfig.rocketSpeed * DEFAULT_THRUST_FORCE_VALUE;
@@ -69,8 +117,8 @@ namespace Assets.Scripts.Control
             {
                 particleSystem.Stop();
             }
+            
             _rigidBody = GetComponent<Rigidbody>();
-            _isEnabled = true;
         }
         private void FixedUpdate () {
             if (_isEnabled)
@@ -133,28 +181,6 @@ namespace Assets.Scripts.Control
             }
 
             _rigidBody.freezeRotation = false;
-        }
-   
-        public void Explode()
-        {
-            _explosionSource.Play();
-           
-            foreach (var particleSystem in _explosionParticleSystems)
-            {
-                particleSystem.Play();
-            }
-        }
-
-        public void EnableFallingMode()
-        {
-            Quaternion targetRotation1 = new Quaternion(0f, 0f, 1f,0f);
-            _fallingSequence = DOTween.Sequence()
-                .Append(transform.DORotateQuaternion(targetRotation1, 2f));
-        }
-
-        public void DisableFallingMode()
-        {
-            if (_fallingSequence != null) if(_fallingSequence.active) _fallingSequence.Kill();
         }
     }
 }

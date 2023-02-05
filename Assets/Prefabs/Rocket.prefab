@@ -78,9 +78,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5920425612487952085}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7522340896c95c546b4764ec5e236e21, type: 3}
+  m_Script: {fileID: 11500000, guid: ed4a0737006f77f4a96d6b509a780e75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameConfig: {fileID: 11400000, guid: 36707f374435d75428a2bb7cce33c4af, type: 2}
   _particleSystems:
   - {fileID: 5830793966875133052}
   - {fileID: 5830035935105502932}
@@ -91,6 +92,8 @@ MonoBehaviour:
   - {fileID: 5830438616179327829}
   - {fileID: 5829991543614657747}
   - {fileID: 5829910573901476667}
+  _heightTracker: {fileID: 1719353255041313345}
+  _launchTracker: {fileID: 5920425612487952095}
 --- !u!114 &5920425612487952095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,6 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b93725e8e924ac4681ab3fcd1b54c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameConfig: {fileID: 11400000, guid: 36707f374435d75428a2bb7cce33c4af, type: 2}
 --- !u!1 &5920425612880971269
 GameObject:
   m_ObjectHideFlags: 0

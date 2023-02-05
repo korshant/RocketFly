@@ -3,42 +3,42 @@ using UnityEngine;
 
 public class CameraFollower : MonoBehaviour
 {
-    [SerializeField] private Transform target;
-    [SerializeField] private float smoothSpeed = 0.125f;
-    [SerializeField] private Vector3 offset;
+    [SerializeField]
+    private float _smoothSpeed = 0.125f;
+    [SerializeField] 
+    private Vector3 _offset;
 
-    [SerializeField] private LaunchTracker _launchTracker;
-
+    private Transform _target;
+    private Transform _initialTransform;
     private bool _isEnabled = false;
 
     public bool IsEnabled
     {
         get => _isEnabled;
-        set => _isEnabled = value;
+        set
+        {
+            _isEnabled = value;
+            print("CameraFollower is On " + _isEnabled);
+        }
     }
 
-    private void OnEnable()
+    public void SetTarget(Transform target)
     {
-        _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
+        _target = target;
     }
 
-    private void OnDisable()
+    public void SetPosition(Vector3 pos)
     {
-        _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
+        transform.position = pos;
     }
-    
+
     private void LateUpdate()
     {
         if (_isEnabled)
         {
-            Vector3 desiredPosition = target.position + offset;
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+            Vector3 desiredPosition = _target.position + _offset;
+            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, _smoothSpeed);
             transform.position = new Vector3(transform.position.x, smoothedPosition.y, transform.position.z);
         }
-    }
-    
-    private void LaunchTrackerOnOnRocketLaunch()
-    {
-        _isEnabled = true;
     }
 }

@@ -9,22 +9,21 @@ namespace Assets.Scripts
         [Tooltip("Multiplier to the force produced by a rocket engine that moves the rocket.")]
         [Range(0, 2f)]
         public float rocketSpeed = 1f;
+        public Vector3 rocketStartPos;
+        public GameObject _rocketPrefab;
 
         [Space(10)] [Header("Tunnel Properties")]
-        [Tooltip("A tunnel section with a launching platform and no collision detection")]
-        public GameObject firstTunnelSection;
-        
-        [Tooltip("Tunnel sections used to randomly generate tunnel")]
+        [Tooltip("Tunnel sections used to randomly generate tunnel.")]
         public GameObject[] randomTunnelSections;
         
-        [Tooltip("Section height. Used to specify Y shift for sections placement")]
-        public float tunnelSectionHeight;
+        [Tooltip("First tunnel section")]
+        public GameObject firstTunnelSection;
         
-        [Tooltip("The amount of rockets Y travel before next Section is being spawned/placed")]
-        public float spawnDistanceGap;
+        [Tooltip("Single sections height. Should be similar to all the sections. Used to specify Y shift for sections placement")]
+        public float tunnelSectionHeight;
 
-        [Tooltip("The height difference that needs to be reached for the rocket's height event to fire")]
-        public float heightTreshold;
+        [Header("Camera Properties")]
+        public Vector3 cameraStartPos;
 
     }
 }

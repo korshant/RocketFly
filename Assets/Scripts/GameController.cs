@@ -8,6 +8,9 @@ namespace Assets.Scripts
     public class GameController : MonoBehaviour
     {
         private bool _isGameStarted;
+        private Rocket _rocket;
+        private RocketHeightTracker _heightTracker;
+        private LaunchTracker _launchTracker;
 
         [SerializeField] 
         private GameConfig _gameConfig;
@@ -16,51 +19,69 @@ namespace Assets.Scripts
         private TunnelSpawner _tunnelSpawner;
 
         [SerializeField]
-        private RocketController _rocket;
-        
-        [SerializeField]
-        private RocketHeightTracker _heightTracker;
-
-        [SerializeField]
         private CameraFollower _cameraFollower;
-
-        [SerializeField]
-        private BoxCollider _startGameTrigger;
-
-        [SerializeField]
-        private LaunchTracker _launchTracker;
-    
+        
         public bool IsGameStarted => _isGameStarted;
-
-        public void StartGame()
+        
+        private void Start()
         {
-            // reset states
-            // spawn player
-            // spawn blocks
-            SceneManager.LoadScene(0);
+            StartGame();
+        }
+        
+        private void OnDisable()
+        {
+            DisableEventsTracking();
         }
 
-        private void Awake()
+        private void EnableEventsTracking()
         {
+            _heightTracker.OnHeightReached += OnHeightReached;
+            _launchTracker.OnRocketLaunch += OnRocketLaunch;
+            _rocket.OnRocketCollide += OnRocketCollide;
+            _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
+        }
+
+        private void DisableEventsTracking()
+        {
+            _heightTracker.OnHeightReached -= OnHeightReached;
+            _launchTracker.OnRocketLaunch -= OnRocketLaunch;
+            _rocket.OnRocketCollide -= OnRocketCollide;
+            _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
+        }
+        
+        private void StartGame()
+        {
+            SpawnRocket();
+            ResetCameraFollower();
+            EnableEventsTracking();
+            _tunnelSpawner.SpawnTunnelSection();
+            _tunnelSpawner.SpawnTunnelSection();
+        }
+        private void SpawnRocket()
+        {
+            print("SpawnRocket");
+            GameObject gameObject =
+                Instantiate(_gameConfig._rocketPrefab, _gameConfig.rocketStartPos, Quaternion.identity);
+            _rocket = gameObject.GetComponent<Rocket>();
+            _heightTracker = gameObject.GetComponent<RocketHeightTracker>();
+            _launchTracker = gameObject.GetComponent<LaunchTracker>();
+            
             _rocket.ShipSpeed = _gameConfig.rocketSpeed;
         }
 
-        private void Start()
+        private void Restart()
         {
-            _tunnelSpawner.SpawnTunnelSection();
+            print("Game Restart");
+            _isGameStarted = false;
+            _tunnelSpawner.Reset();
+            _rocket.Reset();
+            ResetCameraFollower();
+            EnableEventsTracking();
         }
 
-        private void ResetComponents()
+        private void ResetCameraFollower()
         {
-        
-        }
-
-        private void OnEnable()
-        {
-            _heightTracker.OnHeightReached += OnHeightReached;
-            _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
-            _rocket.OnRocketCollide += OnRocketCollide;
-            _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
+            _cameraFollower.SetPosition(_gameConfig.cameraStartPos);
         }
 
         private void OnHeightReached(float height)
@@ -68,17 +89,11 @@ namespace Assets.Scripts
             _tunnelSpawner.SpawnTunnelSection();
         }
 
-        private void OnDisable()
-        {
-            _heightTracker.OnHeightReached -= OnHeightReached;
-            _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
-            _rocket.OnRocketCollide -= OnRocketCollide;
-            _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
-        }
-
-        private void LaunchTrackerOnOnRocketLaunch()
+        private void OnRocketLaunch()
         {
             _rocket.IsLaunched = true;
+            _cameraFollower.IsEnabled = true;
+            _cameraFollower.SetTarget(_rocket.transform);
         }
 
         private void OnRocketHitTrigger()
@@ -98,13 +113,16 @@ namespace Assets.Scripts
                 _cameraFollower.IsEnabled = false;
                 DOTween.Sequence()
                     .AppendInterval(0.5f)
-                    .AppendCallback(_rocket.EnableFallingMode)
+                    .AppendCallback(()=>
+                    {
+                        DisableEventsTracking();
+                        _rocket.EnableFallingMode();
+                    })
                     .AppendInterval(2f)
-                    .AppendCallback(StartGame);
+                    .AppendCallback(Restart);
             }
             else if (_rocket.FallingSequence != null)
             {
-                _rocket.Explode();
                 if (_rocket.FallingSequence.active)
                 {
                     _rocket.DisableFallingMode();

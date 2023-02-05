@@ -14,12 +14,17 @@ public class LaunchTracker : MonoBehaviour
 
     private bool _isLaunched = false;
 
-    public bool IsLaunched => _isLaunched;
+    public bool IsLaunched
+    {
+        get => _isLaunched;
+        set => _isLaunched = value;
+    }
 
     private void Update()
     {
         if (!_isLaunched && transform.position.y > _startingYPos)
         {
+            print("Rocket Launched");
             _isLaunched = true;
             OnRocketLaunch?.Invoke();
         }

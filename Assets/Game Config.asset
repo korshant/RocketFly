@@ -13,12 +13,14 @@ MonoBehaviour:
   m_Name: Game Config
   m_EditorClassIdentifier: 
   rocketSpeed: 1
-  firstTunnelSection: {fileID: 5219087950314785825, guid: 6f89b9f0fff621346bbb168dccb162e3, type: 3}
+  rocketStartPos: {x: 0, y: -13.9, z: 0}
+  _rocketPrefab: {fileID: 5920425612487952085, guid: 99b3656c11a8db34ba619ac61b36f0f6, type: 3}
   randomTunnelSections:
   - {fileID: 5232054947834435067, guid: 19c2b90eaa36ebe4bb3f73957efb0b75, type: 3}
   - {fileID: 6502983699427702652, guid: 26b1602bd8ccab94ea549869291bb137, type: 3}
   - {fileID: 3242308239500452840, guid: a27065c193bd0fb4cb2c77ff0720e268, type: 3}
   - {fileID: 859066260177710340, guid: 847cc9b859e5baa489d8961a3fb51de9, type: 3}
+  firstTunnelSection: {fileID: 5219087950314785825, guid: 6f89b9f0fff621346bbb168dccb162e3, type: 3}
   tunnelSectionHeight: 35.9
-  spawnDistanceGap: 35.9
-  heightTreshold: 30
+  heightTreshold: 35.9
+  cameraStartPos: {x: 0, y: 0, z: -50}

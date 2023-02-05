@@ -10,24 +10,30 @@ public class RocketHeightTracker : MonoBehaviour
     private GameConfig _gameConfig;
     
     private float _heightThreshold;
-    private float lastHeight;
+    private float _lastHeight;
 
+
+    public void Reset()
+    {
+        _lastHeight = 0f;
+    }
+    
     private void Awake()
     {
-        _heightThreshold = _gameConfig.heightTreshold;
+        _heightThreshold = _gameConfig.tunnelSectionHeight;
     }
 
     private void Start()
     {
-        lastHeight = transform.position.y;
+        _lastHeight = transform.position.y;
     }
 
     private void Update()
     {
         float currentHeight = transform.position.y;
-        if (currentHeight - lastHeight > _heightThreshold)
+        if (currentHeight - _lastHeight > _heightThreshold)
         {
-            lastHeight = currentHeight;
+            _lastHeight = currentHeight;
             OnHeightReached?.Invoke(currentHeight);
         }
     }
