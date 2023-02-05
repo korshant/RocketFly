@@ -58,8 +58,8 @@ namespace RocketFly.Scripts
         private void SpawnTunnel()
         {
             _tunnelSpawner.Configure(_gameConfig);
-            _tunnelSpawner.SpawnTunnelSection();
-            _tunnelSpawner.SpawnTunnelSection();
+            _tunnelSpawner.SpawnFirstSection();
+            _tunnelSpawner.SpawnRandomSection();
         }
         
         private void SpawnRocket()
@@ -91,7 +91,7 @@ namespace RocketFly.Scripts
 
         private void OnHeightReached(float height)
         {
-            _tunnelSpawner.SpawnTunnelSection();
+            _tunnelSpawner.SpawnRandomSection();
         }
 
         private void OnRocketLaunch()

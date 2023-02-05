@@ -6,7 +6,7 @@ namespace RocketFly.Scripts
     public class TunnelSpawner : MonoBehaviour
     {
         private GameObject _firstTunnelSectionPrefab;
-        private GameObject _firstTunnelSectionInstanceRef;
+        private GameObject _firstTunnelSectionInstance;
         private GameObject[] _tunnelSectionPrefabs;
         private float _tunnelSectionHeight;
         private Queue<GameObject> _tunnelSections;
@@ -19,20 +19,22 @@ namespace RocketFly.Scripts
             _tunnelSectionPrefabs = gameConfig.randomTunnelSections;
             _tunnelSectionHeight = gameConfig.tunnelSectionHeight;
             _tunnelSections = new Queue<GameObject>();
-            _spawnPosition = new Vector3(0f, 0f, 0f);
+            _spawnPosition = new Vector3(0f, _tunnelSectionHeight, 0f);
             _tunnelSectionsParent = new GameObject("Environment").transform;
         }
 
-        public void SpawnTunnelSection()
+        public void SpawnFirstSection()
+        {
+            _firstTunnelSectionInstance = Instantiate(_firstTunnelSectionPrefab);
+            _firstTunnelSectionInstance.transform.SetParent(_tunnelSectionsParent);
+            _firstTunnelSectionInstance.transform.position = Vector3.zero;
+        }
+
+        public void SpawnRandomSection()
         {
             GameObject tunnelSection;
 
-            if (_tunnelSections.Count == 0)
-            {
-                tunnelSection = Instantiate(_firstTunnelSectionPrefab);
-                _firstTunnelSectionInstanceRef = tunnelSection;
-            }
-            else if (_tunnelSections.Count > 3)
+            if (_tunnelSections.Count > 3)
             {
                 tunnelSection = _tunnelSections.Dequeue();
             }
@@ -45,7 +47,7 @@ namespace RocketFly.Scripts
             tunnelSection.transform.position = _spawnPosition;
         
             tunnelSection.SetActive(true);
-            if(tunnelSection != _firstTunnelSectionInstanceRef) _tunnelSections.Enqueue(tunnelSection);
+            _tunnelSections.Enqueue(tunnelSection);
             _spawnPosition += Vector3.up * _tunnelSectionHeight;
         }
 
@@ -57,9 +59,9 @@ namespace RocketFly.Scripts
                 Destroy(section);
             }
             _tunnelSections.Clear();
-            _spawnPosition = new Vector3(0f, 0f, 0f);
-            SpawnTunnelSection();
-            SpawnTunnelSection();
+            _spawnPosition = new Vector3(0f, _tunnelSectionHeight, 0f);
+            SpawnFirstSection();
+            SpawnRandomSection();
         }
     }
 }
