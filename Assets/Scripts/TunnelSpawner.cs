@@ -1,71 +1,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TunnelSpawner : MonoBehaviour
+namespace RocketFly.Scripts
 {
-    [SerializeField]
-    private GameObject firstTunnelSectionPrefab;
-
-    [SerializeField]
-    private GameObject[] tunnelSectionPrefabs;
-
-    [SerializeField]
-    private float spawnDistance = 35.9f;
-
-    [SerializeField]
-    private Transform rocketTransform;
-
-    private const float SpawnDistanceGap = 35.9f;
-    private Queue<GameObject> tunnelSections;
-    private Vector3 spawnPosition;
-
-    private void Start()
+    public class TunnelSpawner : MonoBehaviour
     {
-        tunnelSections = new Queue<GameObject>();
-        spawnPosition = new Vector3(0f, spawnDistance, 0f);
+        private GameObject _firstTunnelSectionPrefab;
+        private GameObject[] _tunnelSectionPrefabs;
+        private float _tunnelSectionHeight;
+        private Queue<GameObject> _tunnelSections;
+        private Vector3 _spawnPosition;
+        private Transform _tunnelSectionsParent;
 
-        SpawnTunnelSection();
-    }
-
-    private void Update()
-    {
-        if (Vector3.Distance(rocketTransform.position, spawnPosition) < spawnDistance + SpawnDistanceGap)
+        public void Configure(GameConfig gameConfig)
         {
+            _firstTunnelSectionPrefab = gameConfig.firstTunnelSection;
+            _tunnelSectionPrefabs = gameConfig.randomTunnelSections;
+            _tunnelSectionHeight = gameConfig.tunnelSectionHeight;
+            _tunnelSections = new Queue<GameObject>();
+            _spawnPosition = new Vector3(0f, 0f, 0f);
+            _tunnelSectionsParent = new GameObject("Environment").transform;
+        }
+
+        public void SpawnTunnelSection()
+        {
+            GameObject tunnelSection;
+
+            if (_tunnelSections.Count == 0)
+            {
+                tunnelSection = Instantiate(_firstTunnelSectionPrefab);
+            }
+            else if (_tunnelSections.Count > 3)
+            {
+                tunnelSection = _tunnelSections.Dequeue();
+            }
+            else
+            {
+                tunnelSection = Instantiate(_tunnelSectionPrefabs[Random.Range(1, _tunnelSectionPrefabs.Length)]);
+            }
+
+            tunnelSection.transform.SetParent(_tunnelSectionsParent);
+            tunnelSection.transform.position = _spawnPosition;
+        
+            tunnelSection.SetActive(true);
+            _tunnelSections.Enqueue(tunnelSection);
+            _spawnPosition += Vector3.up * _tunnelSectionHeight;
+        }
+
+        public void Reset()
+        {
+            print("Tunnel spawner reset");
+            foreach (var section in _tunnelSections)
+            {
+                Destroy(section);
+            }
+            _tunnelSections.Clear();
+            _spawnPosition = new Vector3(0f, 0f, 0f);
+            SpawnTunnelSection();
             SpawnTunnelSection();
         }
-    }
-
-    private void SpawnTunnelSection()
-    {
-        GameObject tunnelSection;
-        if (tunnelSections.Count > 3)
-        {
-            tunnelSection = tunnelSections.Dequeue();
-            if (firstTunnelSectionPrefab.activeInHierarchy)
-            {
-                firstTunnelSectionPrefab.SetActive(false);
-            }
-        }
-        else
-        {
-            tunnelSection = Instantiate(tunnelSectionPrefabs[Random.Range(0, tunnelSectionPrefabs.Length)]);
-        }
-
-        tunnelSection.transform.position = spawnPosition;
-        tunnelSection.SetActive(true);
-        tunnelSections.Enqueue(tunnelSection);
-        spawnPosition += Vector3.up * spawnDistance;
-    }
-
-    public void ResetProgress()
-    {
-        firstTunnelSectionPrefab.SetActive(true);
-        foreach (var section in tunnelSections)
-        {
-            Destroy(section);
-        }
-        tunnelSections.Clear();
-        spawnPosition = new Vector3(0f, spawnDistance, 0f);
     }
 }
 

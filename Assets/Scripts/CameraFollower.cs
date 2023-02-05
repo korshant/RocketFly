@@ -1,44 +1,46 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class CameraFollower : MonoBehaviour
+namespace RocketFly.Scripts
 {
-    [SerializeField] private Transform target;
-    [SerializeField] private float smoothSpeed = 0.125f;
-    [SerializeField] private Vector3 offset;
-
-    [SerializeField] private LaunchTracker _launchTracker;
-
-    private bool _isEnabled = false;
-
-    public bool IsEnabled
+    public class CameraFollower : MonoBehaviour
     {
-        get => _isEnabled;
-        set => _isEnabled = value;
-    }
+        [SerializeField]
+        private float _smoothSpeed = 0.125f;
+        [SerializeField] 
+        private Vector3 _offset;
 
-    private void OnEnable()
-    {
-        _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
-    }
+        private Transform _target;
+        private Transform _initialTransform;
+        private bool _isEnabled = false;
 
-    private void OnDisable()
-    {
-        _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
-    }
-    
-    private void LateUpdate()
-    {
-        if (_isEnabled)
+        public bool IsEnabled
         {
-            Vector3 desiredPosition = target.position + offset;
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-            transform.position = new Vector3(transform.position.x, smoothedPosition.y, transform.position.z);
+            get => _isEnabled;
+            set
+            {
+                _isEnabled = value;
+                print("CameraFollower is On " + _isEnabled);
+            }
         }
-    }
-    
-    private void LaunchTrackerOnOnRocketLaunch()
-    {
-        _isEnabled = true;
+
+        public void SetTarget(Transform target)
+        {
+            _target = target;
+        }
+
+        public void SetPosition(Vector3 pos)
+        {
+            transform.position = pos;
+        }
+
+        private void LateUpdate()
+        {
+            if (_isEnabled)
+            {
+                Vector3 desiredPosition = _target.position + _offset;
+                Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, _smoothSpeed);
+                transform.position = new Vector3(transform.position.x, smoothedPosition.y, transform.position.z);
+            }
+        }
     }
 }

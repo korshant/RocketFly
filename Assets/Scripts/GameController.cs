@@ -1,83 +1,139 @@
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class GameController : MonoBehaviour
+namespace RocketFly.Scripts
 {
-    [SerializeField]
-    private TunnelSpawner _tunnelSpawner;
-
-    [SerializeField]
-    private Transform _rocketBaseTransform;
-
-    [SerializeField]
-    private RocketController _rocket;
-
-    [SerializeField]
-    private CameraFollower _follower;
-
-    [SerializeField]
-    private BoxCollider _startGameTrigger;
-
-    [SerializeField]
-    private LaunchTracker _launchTracker;
-
-    private bool _isGameStarted;
-    public bool IsGameStarted => _isGameStarted;
-
-    private void OnEnable()
+    public class GameController : MonoBehaviour
     {
-        _launchTracker.OnRocketLaunch += LaunchTrackerOnOnRocketLaunch;
-        _rocket.OnRocketCollide += OnRocketCollide;
-        _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
-    }
+        private bool _isGameStarted;
+        private Rocket _rocket;
+        private RocketHeightTracker _heightTracker;
+        private LaunchTracker _launchTracker;
 
-    private void OnDisable()
-    {
-        _launchTracker.OnRocketLaunch -= LaunchTrackerOnOnRocketLaunch;
-        _rocket.OnRocketCollide -= OnRocketCollide;
-        _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
-    }
+        [SerializeField] 
+        private GameConfig _gameConfig;
+    
+        [SerializeField]
+        private TunnelSpawner _tunnelSpawner;
 
-    private void LaunchTrackerOnOnRocketLaunch()
-    {
-        _rocket.IsLaunched = true;
-    }
+        [SerializeField]
+        private CameraFollower _cameraFollower;
 
-    private void OnRocketHitTrigger()
-    {
-        _isGameStarted = true;
-    }
-
-    private void OnRocketCollide(Collision collision)
-    {
-        if (_isGameStarted)
+        public bool IsGameStarted => _isGameStarted;
+        
+        private void Start()
         {
-            _isGameStarted = false;
-
-            _rocket.Explode();
-            _rocket.IsEnabled = false;
-            _isGameStarted = false;
-            _follower.IsEnabled = false;
-            DOTween.Sequence()
-                .AppendInterval(0.5f)
-                .AppendCallback(_rocket.EnableFallingMode)
-                .AppendInterval(2f)
-                .AppendCallback(StartGame);
+            StartGame();
         }
-        else if (_rocket.FallingSequence != null)
+        
+        private void OnDisable()
         {
-            _rocket.Explode();
-            if (_rocket.FallingSequence.active)
+            DisableEventsTracking();
+        }
+
+        private void EnableEventsTracking()
+        {
+            _heightTracker.OnHeightReached += OnHeightReached;
+            _launchTracker.OnRocketLaunch += OnRocketLaunch;
+            _rocket.OnRocketCollide += OnRocketCollide;
+            _rocket.OnRocketHitTrigger += OnRocketHitTrigger;
+        }
+
+        private void DisableEventsTracking()
+        {
+            _heightTracker.OnHeightReached -= OnHeightReached;
+            _launchTracker.OnRocketLaunch -= OnRocketLaunch;
+            _rocket.OnRocketCollide -= OnRocketCollide;
+            _rocket.OnRocketHitTrigger -= OnRocketHitTrigger;
+        }
+        
+        private void StartGame()
+        {
+            SpawnRocket();
+            ResetCameraFollower();
+            EnableEventsTracking();
+            SpawnTunnel();
+        }
+
+        private void SpawnTunnel()
+        {
+            _tunnelSpawner.Configure(_gameConfig);
+            _tunnelSpawner.SpawnTunnelSection();
+            _tunnelSpawner.SpawnTunnelSection();
+        }
+        
+        private void SpawnRocket()
+        {
+            print("SpawnRocket");
+            GameObject gameObject =
+                Instantiate(_gameConfig._rocketPrefab, _gameConfig.rocketStartPos, Quaternion.identity);
+            _rocket = gameObject.GetComponent<Rocket>();
+            _heightTracker = gameObject.GetComponent<RocketHeightTracker>();
+            _launchTracker = gameObject.GetComponent<LaunchTracker>();
+            
+            _rocket.ShipSpeed = _gameConfig.rocketSpeed;
+        }
+
+        private void Restart()
+        {
+            print("Game Restart");
+            _isGameStarted = false;
+            _tunnelSpawner.Reset();
+            _rocket.Reset();
+            ResetCameraFollower();
+            EnableEventsTracking();
+        }
+
+        private void ResetCameraFollower()
+        {
+            _cameraFollower.SetPosition(_gameConfig.cameraStartPos);
+        }
+
+        private void OnHeightReached(float height)
+        {
+            _tunnelSpawner.SpawnTunnelSection();
+        }
+
+        private void OnRocketLaunch()
+        {
+            _rocket.IsLaunched = true;
+            _cameraFollower.IsEnabled = true;
+            _cameraFollower.SetTarget(_rocket.transform);
+        }
+
+        private void OnRocketHitTrigger()
+        {
+            _isGameStarted = true;
+        }
+
+        private void OnRocketCollide(Collision collision)
+        {
+            if (_isGameStarted)
             {
-                _rocket.DisableFallingMode();
+                _isGameStarted = false;
+
+                _rocket.Explode();
+                _rocket.IsEnabled = false;
+                _isGameStarted = false;
+                _cameraFollower.IsEnabled = false;
+                DOTween.Sequence()
+                    .AppendInterval(0.5f)
+                    .AppendCallback(()=>
+                    {
+                        _rocket.EnableFallingMode();
+                    })
+                    .AppendInterval(2f)
+                    .AppendCallback(Restart);
+            }
+            else if (_rocket.FallingSequence != null)
+            {
+                if (_rocket.FallingSequence.active)
+                {
+                    _rocket.DisableFallingMode();
+                    DisableEventsTracking();
+                }
             }
         }
-    }
-
-    public void StartGame()
-    {
-        SceneManager.LoadScene(0);
     }
 }
 
